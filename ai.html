@@ -14,6 +14,8 @@
     input { flex: 1; padding: 10px; font-size: 14px; border: 1px solid #ccc; border-radius: 8px; }
     button { padding: 10px 16px; border: none; border-radius: 20px; background: #4CAF50; color: white; cursor: pointer; transition: background 0.2s; }
     button:hover { background: #45a049; }
+    #sendSensor { margin-top: 10px; background: #2196F3; }
+    #sendSensor:hover { background: #1976D2; }
   </style>
 </head>
 <body>
@@ -31,10 +33,10 @@
     <input id="input" placeholder="Nhập tin nhắn..." />
     <button onclick="send()">Gửi</button>
   </div>
+  <button id="sendSensor">Gửi dữ liệu cảm biến</button>
 </div>
 
 <script>
-// API vẫn dùng bình thường, dù hết credit
 const API_KEY = "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";
 
 async function send() {
@@ -75,18 +77,19 @@ function add(who, text, cls) {
   document.getElementById("messages").appendChild(msg);
   msg.scrollIntoView();
 }
-</script>
 
+// Era Widget
 <script src="https://www.unpkg.com/@eohjsc/era-widget@1.1.3/src/index.js"></script>
 <script>
 const thanNhiet = document.getElementById('ThanNhiet');
 const nhipTim   = document.getElementById('nhipTim');
 const Sp02      = document.getElementById('Sp02');
+const sendSensorBtn = document.getElementById("sendSensor");
 
 let configThanNhiet = null, configNhipTim = null, configSpO2 = null;
 let lastValues = { thanNhiet: null, nhipTim: null, SpO2: null };
 let stableTimer = null;
-let sentFinal = false; // chỉ gửi 1 lần
+let sentFinal = false;
 
 const eraWidget = new EraWidget();
 eraWidget.init({
@@ -117,7 +120,6 @@ eraWidget.init({
 
     if (sentFinal) return;
 
-    // Kiểm tra thay đổi
     const changed = 
       valueThanNhiet !== lastValues.thanNhiet ||
       valueNhipTim !== lastValues.nhipTim ||
@@ -129,11 +131,26 @@ eraWidget.init({
         const sensorMsg = `Dữ liệu cảm biến ổn định sau 50s:\n- Thân nhiệt: ${valueThanNhiet} °C\n- Nhịp tim: ${valueNhipTim} bpm\n- Nồng độ O₂: ${valueSpO2}%`;
         sendToGPT("Sensor", sensorMsg);
         sentFinal = true;
-      }, 50000); // 50 giây
+      }, 50000);
     }
 
     lastValues = { thanNhiet: valueThanNhiet, nhipTim: valueNhipTim, SpO2: valueSpO2 };
   }
+});
+
+// Nút gửi dữ liệu cảm biến ngay
+sendSensorBtn.addEventListener("click", () => {
+  const valueThanNhiet = thanNhiet.textContent;
+  const valueNhipTim   = nhipTim.textContent;
+  const valueSpO2      = Sp02.textContent;
+
+  if (valueThanNhiet === "--" || valueNhipTim === "--" || valueSpO2 === "--") {
+    alert("Cảm biến chưa có dữ liệu!");
+    return;
+  }
+
+  const sensorMsg = `Dữ liệu cảm biến (gửi thủ công):\n- Thân nhiệt: ${valueThanNhiet} °C\n- Nhịp tim: ${valueNhipTim} bpm\n- Nồng độ O₂: ${valueSpO2}%`;
+  sendToGPT("Sensor", sensorMsg);
 });
 </script>
 </body>
