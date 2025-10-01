@@ -19,6 +19,13 @@
 <body>
   <div id="chat">
     <h3>Smart Medicine Box</h3>
+    <div id="sensor-data" style="margin-bottom:10px; font-size:14px; color:#333;">
+  <div>Thân nhiệt: <span id="ThanNhiet">--</span> °C</div>
+  <div>Nhịp tim: <span id="nhipTim">--</span> bpm</div>
+  <div>SpO₂: <span id="Sp02">--</span> %</div>
+</div>
+
+    <!---->
     <div id="messages"></div>
     <div id="input-area">
       <input id="input" placeholder="Nhập tin nhắn..." />
@@ -94,11 +101,15 @@
         const valueNhipTim   = values[configNhipTim.id].value;
         const valueSp02      = values[configSpO2.id].value;
 
-        console.log(" Thân nhiệt:", thanNhiet, "°C");
-        console.log("Nhịp tim:", nhipTim, "bpm");
-        console.log(" SpO₂:", Sp02, "%");
+        console.log(" Thân nhiệt:", valueThanNhiet, "°C");
+        console.log("Nhịp tim:", valueNhipTim, "bpm");
+        console.log(" SpO₂:", valueSp02, "%");
+        // Cập nhật ra giao diện
+    thanNhiet.textContent = valueThanNhiet;
+    nhipTim.textContent   = valueNhipTim;
+    Sp02.textContent      = valueSp02;
 
-        const sensorMsg = `Dữ liệu cảm biến:\n- Thân nhiệt: ${thanNhiet} °C\n- Nhịp tim: ${nhipTim} bpm\n- Nồng độ O₂: ${Sp02}%`;
+        const sensorMsg = `Dữ liệu cảm biến:\n- Thân nhiệt: ${valueThanNhiet} °C\n- Nhịp tim: ${valueNhipTim} bpm\n- Nồng độ O₂: ${valueSp02}%`;
         sendToGPT("Sensor", sensorMsg);
       }
     });
