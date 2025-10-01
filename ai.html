@@ -125,21 +125,46 @@
       document.getElementById("messages").appendChild(msg);
       msg.scrollIntoView();
     }
+<script src="https://www.unpkg.com/@eohjsc/era-widget@1.1.3/src/index.js"></script>
+<script>
+  let configThanNhiet = null, configNhipTim = null, configSpO2 = null;
 
-    // Nhận dữ liệu realtime từ Era IoT
-    window.addEventListener("message", (event) => {
-      console.log("== Nhận dữ liệu từ Era ==", event.data);
+  const eraWidget = new EraWidget();
+  eraWidget.init({
+    needRealtimeConfigs: true,
+    needHistoryConfigs: false,
+    needActions: false,
 
-      const config = event.data.configuration;
-      if (config && config.realtime_configs) {
-        const thanNhiet = config.realtime_configs[0];
-        const nhipTim   = config.realtime_configs[1];
-        const spo2      = config.realtime_configs[2];
+    // Lấy cấu hình (mapping ID cho từng cảm biến)
+    onConfiguration: (configuration) => {
+      configThanNhiet = configuration.realtime_configs[0]; // Thân nhiệt
+      configNhipTim   = configuration.realtime_configs[1]; // Nhịp tim
+      configSpO2      = configuration.realtime_configs[2]; // SpO2
+      console.log("Config:", configuration);
+    },
 
-        const sensorMsg = `Dữ liệu cảm biến: Thân nhiệt ${thanNhiet}°C, Nhịp tim ${nhipTim} bpm, Nồng độ O₂ ${spo2}%`;
-        sendToGPT("Sensor", sensorMsg);
-      }
-    });
+    // Lấy dữ liệu cảm biến realtime
+    onValues: (values) => {
+      const thanNhiet = values[configThanNhiet.id]?.value;
+      const nhipTim   = values[configNhipTim.id]?.value;
+      const spo2      = values[configSpO2.id]?.value;
+
+      console.log("📡 Thân nhiệt:", thanNhiet, "°C");
+      console.log("❤️ Nhịp tim:", nhipTim, "bpm");
+      console.log("🫁 SpO₂:", spo2, "%");
+
+      // Ghép thành chuỗi để gửi sang AI chatbox
+      const sensorMsg = `Dữ liệu cảm biến:
+- Thân nhiệt: ${thanNhiet} °C
+- Nhịp tim: ${nhipTim} bpm
+- Nồng độ O₂: ${spo2}%`;
+
+      // Ví dụ gọi hàm gửi sang AI chat
+      sendToGPT("Sensor", sensorMsg);
+    }
+  });
+</script>
+
     </script>
 </body>
 
