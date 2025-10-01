@@ -102,4 +102,61 @@ eraWidget.init({
   needActions: false,
 
   onConfiguration: (configuration) => {
-    configThanN
+    configThanNhiet = configuration.realtime_configs[0];
+    configNhipTim   = configuration.realtime_configs[1];
+    configSpO2      = configuration.realtime_configs[2];
+    console.log("Realtime configs:", configuration.realtime_configs);
+  },
+
+  onValues: (values) => {
+    if (!configThanNhiet || !configNhipTim || !configSpO2) return;
+
+    const valueThanNhiet = values[configThanNhiet.id]?.value;
+    const valueNhipTim   = values[configNhipTim.id]?.value;
+    const valueSpO2      = values[configSpO2.id]?.value;
+
+    if (valueThanNhiet == null || valueNhipTim == null || valueSpO2 == null) return;
+
+    // Cập nhật giao diện
+    thanNhiet.textContent = valueThanNhiet;
+    nhipTim.textContent   = valueNhipTim;
+    Sp02.textContent      = valueSpO2;
+
+    if (sentFinal) return;
+
+    const changed = 
+      valueThanNhiet !== lastValues.thanNhiet ||
+      valueNhipTim !== lastValues.nhipTim ||
+      valueSpO2 !== lastValues.SpO2;
+
+    if (changed) {
+      if (stableTimer) clearTimeout(stableTimer);
+      stableTimer = setTimeout(() => {
+        const sensorMsg = `Dữ liệu cảm biến ổn định sau 50s:\n- Thân nhiệt: ${valueThanNhiet} °C\n- Nhịp tim: ${valueNhipTim} bpm\n- Nồng độ O₂: ${valueSpO2}%`;
+        sendToGPT("Sensor", sensorMsg);
+        sentFinal = true;
+      }, 50000); // tự động 50s
+    }
+
+    lastValues = { thanNhiet: valueThanNhiet, nhipTim: valueNhipTim, SpO2: valueSpO2 };
+  }
+});
+
+// Nút gửi dữ liệu cảm biến ngay
+sendSensorBtn.addEventListener("click", () => {
+  const valueThanNhiet = thanNhiet.textContent;
+  const valueNhipTim   = nhipTim.textContent;
+  const valueSpO2      = Sp02.textContent;
+
+  if (valueThanNhiet === "--" || valueNhipTim === "--" || valueSpO2 === "--") {
+    alert("Cảm biến chưa có dữ liệu!");
+    return;
+  }
+
+  const sensorMsg = `Dữ liệu cảm biến (gửi thủ công):\n- Thân nhiệt: ${valueThanNhiet} °C\n- Nhịp tim: ${valueNhipTim} bpm\n- Nồng độ O₂: ${valueSpO2}%`;
+  sendToGPT("Sensor", sensorMsg);
+  sentFinal = true; // tránh gửi tự động nữa
+});
+</script>
+</body>
+</html>
