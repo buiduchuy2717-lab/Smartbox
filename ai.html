@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Smart Medicine Box</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: #f0f0f0;
+        }
+
+        #chat {
+            max-width: 400px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: 0 0 5px #aaa;
+        }
+
+        #messages {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+
+        .msg {
+            margin: 5px 0;
+        }
+
+        .user {
+            color: blue;
+        }
+
+        .bot {
+            color: green;
+        }
+
+        #input-area {
+            display: flex;
+            gap: 8px;
+        }
+
+        input {
+            flex: 1;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        button {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 20px;
+            background: #4CAF50;
+            color: white;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="chat">
+        <h3>Smart Medicine Box</h3>
+        <div id="messages"></div>
+        <div id="input-area">
+            <input id="input" placeholder="Nhập tin nhắn..." />
+            <button onclick="send()">Gửi</button>
+        </div>
+    </div>
+
+    <script>
+        // 🔑 Thay API key của em vào đây
+    const API_KEY = "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";
+
+    // Hàm gửi tin nhắn từ user (gõ tay)
+    async function send() {
+      const input = document.getElementById("input");
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = "";
+      sendToGPT("Bạn", text);
+    }
+
+    // Hàm gửi nội dung bất kỳ sang GPT (dùng chung cho user và Era)
+    async function sendToGPT(sender, text) {
+      add(sender, text, "user");
+
+      try {
+        const res = await fetch("https://api.openai.com/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${API_KEY}`
+          },
+          body: JSON.stringify({
+            model: "gpt-4o-mini",
+            messages: [{ role: "user", content: text }]
+          })
+        });
+
+        const data = await res.json();
+        const reply = data.choices?.[0]?.message?.content || "(Lỗi API)";
+        add("AI", reply, "bot");
+      } catch (err) {
+        add("AI", "⚠️ Lỗi kết nối API", "bot");
+        console.error(err);
+      }
+    }
+
+    // Thêm message vào khung chat
+    function add(who, text, cls) {
+      const msg = document.createElement("div");
+      msg.className = "msg " + cls;
+      msg.textContent = who + ": " + text;
+      document.getElementById("messages").appendChild(msg);
+      msg.scrollIntoView();
+    }
+
+    // Nhận dữ liệu realtime từ Era IoT
+    window.addEventListener("message", (event) => {
+      console.log("== Nhận dữ liệu từ Era ==", event.data);
+
+      const config = event.data.configuration;
+      if (config && config.realtime_configs) {
+        const thanNhiet = config.realtime_configs[0];
+        const nhipTim   = config.realtime_configs[1];
+        const spo2      = config.realtime_configs[2];
+
+        const sensorMsg = `Dữ liệu cảm biến: Thân nhiệt ${thanNhiet}°C, Nhịp tim ${nhipTim} bpm, Nồng độ O₂ ${spo2}%`;
+        sendToGPT("Sensor", sensorMsg);
+      }
+    });
+    </script>
+</body>
+
+</html>
