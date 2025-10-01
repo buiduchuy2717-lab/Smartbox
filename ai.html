@@ -39,6 +39,7 @@
 <script>
 const API_KEY = "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";
 
+// Gửi tin nhắn từ ô input
 async function send() {
   const input = document.getElementById("input");
   const text = input.value.trim();
@@ -47,8 +48,9 @@ async function send() {
   sendToGPT("Bạn", text);
 }
 
+// Gửi dữ liệu tới AI
 async function sendToGPT(sender, text) {
-  add(sender, text, "user");
+  add(sender, text, sender === "Bạn" ? "user" : "bot");
   try {
     const res = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -70,6 +72,7 @@ async function sendToGPT(sender, text) {
   }
 }
 
+// Thêm tin nhắn vào chatbox
 function add(who, text, cls) {
   const msg = document.createElement("div");
   msg.className = "msg " + cls;
@@ -77,8 +80,8 @@ function add(who, text, cls) {
   document.getElementById("messages").appendChild(msg);
   msg.scrollIntoView();
 }
+</script>
 
-// Era Widget
 <script src="https://www.unpkg.com/@eohjsc/era-widget@1.1.3/src/index.js"></script>
 <script>
 const thanNhiet = document.getElementById('ThanNhiet');
@@ -91,6 +94,7 @@ let lastValues = { thanNhiet: null, nhipTim: null, SpO2: null };
 let stableTimer = null;
 let sentFinal = false;
 
+// Khởi tạo Era Widget
 const eraWidget = new EraWidget();
 eraWidget.init({
   needRealtimeConfigs: true,
@@ -98,60 +102,4 @@ eraWidget.init({
   needActions: false,
 
   onConfiguration: (configuration) => {
-    configThanNhiet = configuration.realtime_configs[0];
-    configNhipTim   = configuration.realtime_configs[1];
-    configSpO2      = configuration.realtime_configs[2];
-    console.log("Realtime configs:", configuration.realtime_configs);
-  },
-
-  onValues: (values) => {
-    if (!configThanNhiet || !configNhipTim || !configSpO2) return;
-
-    const valueThanNhiet = values[configThanNhiet.id]?.value;
-    const valueNhipTim   = values[configNhipTim.id]?.value;
-    const valueSpO2      = values[configSpO2.id]?.value;
-
-    if (valueThanNhiet == null || valueNhipTim == null || valueSpO2 == null) return;
-
-    // Cập nhật giao diện
-    thanNhiet.textContent = valueThanNhiet;
-    nhipTim.textContent   = valueNhipTim;
-    Sp02.textContent      = valueSpO2;
-
-    if (sentFinal) return;
-
-    const changed = 
-      valueThanNhiet !== lastValues.thanNhiet ||
-      valueNhipTim !== lastValues.nhipTim ||
-      valueSpO2 !== lastValues.SpO2;
-
-    if (changed) {
-      if (stableTimer) clearTimeout(stableTimer);
-      stableTimer = setTimeout(() => {
-        const sensorMsg = `Dữ liệu cảm biến ổn định sau 50s:\n- Thân nhiệt: ${valueThanNhiet} °C\n- Nhịp tim: ${valueNhipTim} bpm\n- Nồng độ O₂: ${valueSpO2}%`;
-        sendToGPT("Sensor", sensorMsg);
-        sentFinal = true;
-      }, 50000);
-    }
-
-    lastValues = { thanNhiet: valueThanNhiet, nhipTim: valueNhipTim, SpO2: valueSpO2 };
-  }
-});
-
-// Nút gửi dữ liệu cảm biến ngay
-sendSensorBtn.addEventListener("click", () => {
-  const valueThanNhiet = thanNhiet.textContent;
-  const valueNhipTim   = nhipTim.textContent;
-  const valueSpO2      = Sp02.textContent;
-
-  if (valueThanNhiet === "--" || valueNhipTim === "--" || valueSpO2 === "--") {
-    alert("Cảm biến chưa có dữ liệu!");
-    return;
-  }
-
-  const sensorMsg = `Dữ liệu cảm biến (gửi thủ công):\n- Thân nhiệt: ${valueThanNhiet} °C\n- Nhịp tim: ${valueNhipTim} bpm\n- Nồng độ O₂: ${valueSpO2}%`;
-  sendToGPT("Sensor", sensorMsg);
-});
-</script>
-</body>
-</html>
+    configThanN
