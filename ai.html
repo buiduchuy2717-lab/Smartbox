@@ -34,7 +34,7 @@
 </div>
 
 <script>
-const API_KEY = "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"; // đổi thành key của bạn
+const API_KEY = "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";
 
 async function send() {
   const input = document.getElementById("input");
@@ -83,7 +83,8 @@ const nhipTim   = document.getElementById('nhipTim');
 const Sp02      = document.getElementById('Sp02');
 
 let configThanNhiet = null, configNhipTim = null, configSpO2 = null;
-let oldThanNhiet = null, oldNhipTim = null, oldSpO2 = null;
+let lastValues = { thanNhiet: null, nhipTim: null, SpO2: null };
+let stableTimer = null;
 
 const eraWidget = new EraWidget();
 eraWidget.init({
@@ -92,7 +93,7 @@ eraWidget.init({
   needActions: false,
 
   onConfiguration: (configuration) => {
-    // Giữ nguyên thứ tự index Era
+    // Giữ nguyên thứ tự Era
     configThanNhiet = configuration.realtime_configs[0];
     configNhipTim   = configuration.realtime_configs[1];
     configSpO2      = configuration.realtime_configs[2];
@@ -102,9 +103,9 @@ eraWidget.init({
   onValues: (values) => {
     if (!configThanNhiet || !configNhipTim || !configSpO2) return;
 
-    const valueThanNhiet = values[configThanNhiet.id].value;
-    const valueNhipTim   = values[configNhipTim.id].value;
-    const valueSpO2      = values[configSpO2.id].value;
+    const valueThanNhiet = values[configThanNhiet.id]?.value;
+    const valueNhipTim   = values[configNhipTim.id]?.value;
+    const valueSpO2      = values[configSpO2.id]?.value;
 
     if (valueThanNhiet == null || valueNhipTim == null || valueSpO2 == null) return;
 
@@ -113,18 +114,22 @@ eraWidget.init({
     nhipTim.textContent   = valueNhipTim;
     Sp02.textContent      = valueSpO2;
 
-    // Chỉ gửi khi có thay đổi
-    if (valueThanNhiet !== oldThanNhiet || valueNhipTim !== oldNhipTim || valueSpO2 !== oldSpO2) {
-      const sensorMsg = `Dữ liệu cảm biến:\n- Thân nhiệt: ${valueThanNhiet} °C\n- Nhịp tim: ${valueNhipTim} bpm\n- Nồng độ O₂: ${valueSpO2}%`;
-      sendToGPT("Sensor", sensorMsg);
+    // Nếu có thay đổi giá trị, reset timer
+    if (valueThanNhiet !== lastValues.thanNhiet ||
+        valueNhipTim !== lastValues.nhipTim ||
+        valueSpO2 !== lastValues.SpO2) {
+      lastValues = { thanNhiet: valueThanNhiet, nhipTim: valueNhipTim, SpO2: valueSpO2 };
+      if (stableTimer) clearTimeout(stableTimer);
 
-      oldThanNhiet = valueThanNhiet;
-      oldNhipTim   = valueNhipTim;
-      oldSpO2      = valueSpO2;
+      // Đặt timer 5 giây để gửi khi ổn định
+      stableTimer = setTimeout(() => {
+        const sensorMsg = `Dữ liệu cảm biến ổn định:\n- Thân nhiệt: ${lastValues.thanNhiet} °C\n- Nhịp tim: ${lastValues.nhipTim} bpm\n- Nồng độ O₂: ${lastValues.SpO2}%`;
+        sendToGPT("Sensor", sensorMsg);
+        stableTimer = null;
+      }, 5000);
     }
   }
 });
 </script>
 </body>
 </html>
-
