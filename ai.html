@@ -126,10 +126,11 @@ eraWidget.init({
         const sensorMsg = `Dữ liệu cảm biến ổn định:\n- Thân nhiệt: ${lastValues.thanNhiet} °C\n- Nhịp tim: ${lastValues.nhipTim} bpm\n- Nồng độ O₂: ${lastValues.SpO2}%`;
         sendToGPT("Sensor", sensorMsg);
         stableTimer = null;
-      }, 5000);
+      }, 20000);
     }
   }
 });
 </script>
 </body>
 </html>
+
