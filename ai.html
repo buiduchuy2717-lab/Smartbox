@@ -102,9 +102,9 @@ eraWidget.init({
   onValues: (values) => {
     if (!configThanNhiet || !configNhipTim || !configSpO2) return;
 
-    const valueThanNhiet = values[configThanNhiet.id]?.value;
-    const valueNhipTim   = values[configNhipTim.id]?.value;
-    const valueSpO2      = values[configSpO2.id]?.value;
+    const valueThanNhiet = values[configThanNhiet.id].value;
+    const valueNhipTim   = values[configNhipTim.id].value;
+    const valueSpO2      = values[configSpO2.id].value;
 
     if (valueThanNhiet == null || valueNhipTim == null || valueSpO2 == null) return;
 
@@ -127,3 +127,4 @@ eraWidget.init({
 </script>
 </body>
 </html>
+
