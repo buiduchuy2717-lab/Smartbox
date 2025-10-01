@@ -1,33 +1,32 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <title>Smart Medicine Box</title>
-  <style>
-    body { font-family: sans-serif; background: #f0f0f0; }
-    #chat { max-width: 400px; margin: 20px auto; background: white; border-radius: 10px; padding: 10px; box-shadow: 0 0 5px #aaa; }
-    #messages { height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 5px; margin-bottom: 10px; }
-    .msg { margin: 5px 0; }
-    .user { color: blue; }
-    .bot { color: green; }
-    #input-area { display: flex; gap: 8px; }
-    input { flex: 1; padding: 10px; font-size: 14px; border: 1px solid #ccc; border-radius: 8px; }
-    button { padding: 10px 16px; border: none; border-radius: 20px; background: #4CAF50; color: white; cursor: pointer; transition: background 0.2s; }
-    button:hover { background: #45a049; }
-    #sendSensor { margin-top: 10px; background: #2196F3; }
-    #sendSensor:hover { background: #1976D2; }
-  </style>
+<meta charset="UTF-8">
+<title>Smart Medicine Box</title>
+<style>
+body { font-family: sans-serif; background: #f0f0f0; }
+#chat { max-width: 400px; margin: 20px auto; background: white; border-radius: 10px; padding: 10px; box-shadow: 0 0 5px #aaa; }
+#messages { height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 5px; margin-bottom: 10px; }
+.msg { margin: 5px 0; }
+.user { color: blue; }
+.bot { color: green; }
+#input-area { display: flex; gap: 8px; }
+input { flex: 1; padding: 10px; font-size: 14px; border: 1px solid #ccc; border-radius: 8px; }
+button { padding: 10px 16px; border: none; border-radius: 20px; background: #4CAF50; color: white; cursor: pointer; transition: background 0.2s; }
+button:hover { background: #45a049; }
+#sendSensor { margin-top: 10px; background: #2196F3; }
+#sendSensor:hover { background: #1976D2; }
+</style>
 </head>
 <body>
+
 <div id="chat">
   <h3>Smart Medicine Box</h3>
-
   <div id="sensor-data" style="margin-bottom:10px; font-size:14px; color:#333;">
     <div>Thân nhiệt: <span id="ThanNhiet">--</span> °C</div>
     <div>Nhịp tim: <span id="nhipTim">--</span> bpm</div>
     <div>SpO₂: <span id="Sp02">--</span> %</div>
   </div>
-
   <div id="messages"></div>
   <div id="input-area">
     <input id="input" placeholder="Nhập tin nhắn..." />
@@ -39,7 +38,14 @@
 <script>
 const API_KEY = "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";
 
-// Gửi tin nhắn từ ô input
+function add(who, text, cls) {
+  const msg = document.createElement("div");
+  msg.className = "msg " + cls;
+  msg.textContent = who + ": " + text;
+  document.getElementById("messages").appendChild(msg);
+  msg.scrollIntoView();
+}
+
 async function send() {
   const input = document.getElementById("input");
   const text = input.value.trim();
@@ -48,7 +54,6 @@ async function send() {
   sendToGPT("Bạn", text);
 }
 
-// Gửi dữ liệu tới AI
 async function sendToGPT(sender, text) {
   add(sender, text, sender === "Bạn" ? "user" : "bot");
   try {
@@ -71,91 +76,80 @@ async function sendToGPT(sender, text) {
     console.error(err);
   }
 }
-
-// Thêm tin nhắn vào chatbox
-function add(who, text, cls) {
-  const msg = document.createElement("div");
-  msg.className = "msg " + cls;
-  msg.textContent = who + ": " + text;
-  document.getElementById("messages").appendChild(msg);
-  msg.scrollIntoView();
-}
 </script>
 
 <script src="https://www.unpkg.com/@eohjsc/era-widget@1.1.3/src/index.js"></script>
 <script>
-const thanNhiet = document.getElementById('ThanNhiet');
-const nhipTim   = document.getElementById('nhipTim');
-const Sp02      = document.getElementById('Sp02');
-const sendSensorBtn = document.getElementById("sendSensor");
+document.addEventListener("DOMContentLoaded", () => {
+  const thanNhiet = document.getElementById('ThanNhiet');
+  const nhipTim = document.getElementById('nhipTim');
+  const Sp02 = document.getElementById('Sp02');
+  const sendSensorBtn = document.getElementById("sendSensor");
 
-let configThanNhiet = null, configNhipTim = null, configSpO2 = null;
-let lastValues = { thanNhiet: null, nhipTim: null, SpO2: null };
-let stableTimer = null;
-let sentFinal = false;
+  let configThanNhiet = null, configNhipTim = null, configSpO2 = null;
+  let lastValues = { t: null, hr: null, sp: null };
+  let stableTimer = null;
+  let sentFinal = false;
 
-// Khởi tạo Era Widget
-const eraWidget = new EraWidget();
-eraWidget.init({
-  needRealtimeConfigs: true,
-  needHistoryConfigs: false,
-  needActions: false,
+  const eraWidget = new EraWidget();
+  eraWidget.init({
+    needRealtimeConfigs: true,
+    needHistoryConfigs: false,
+    needActions: false,
+    onConfiguration: (cfg) => {
+      configThanNhiet = cfg.realtime_configs[0];
+      configNhipTim = cfg.realtime_configs[1];
+      configSpO2 = cfg.realtime_configs[2];
+      console.log("Realtime configs:", cfg.realtime_configs);
+    },
+    onValues: (values) => {
+      if (!configThanNhiet || !configNhipTim || !configSpO2) return;
 
-  onConfiguration: (configuration) => {
-    configThanNhiet = configuration.realtime_configs[0];
-    configNhipTim   = configuration.realtime_configs[1];
-    configSpO2      = configuration.realtime_configs[2];
-    console.log("Realtime configs:", configuration.realtime_configs);
-  },
+      const t = values[configThanNhiet.id]?.value;
+      const hr = values[configNhipTim.id]?.value;
+      const sp = values[configSpO2.id]?.value;
 
-  onValues: (values) => {
-    if (!configThanNhiet || !configNhipTim || !configSpO2) return;
+      if (t != null) thanNhiet.textContent = t;
+      if (hr != null) nhipTim.textContent = hr;
+      if (sp != null) Sp02.textContent = sp;
 
-    const valueThanNhiet = values[configThanNhiet.id]?.value;
-    const valueNhipTim   = values[configNhipTim.id]?.value;
-    const valueSpO2      = values[configSpO2.id]?.value;
+      if (sentFinal) return;
 
-    if (valueThanNhiet == null || valueNhipTim == null || valueSpO2 == null) return;
+      const changed = t !== lastValues.t || hr !== lastValues.hr || sp !== lastValues.sp;
 
-    // Cập nhật giao diện
-    thanNhiet.textContent = valueThanNhiet;
-    nhipTim.textContent   = valueNhipTim;
-    Sp02.textContent      = valueSpO2;
+      if (changed) {
+        if (stableTimer) clearTimeout(stableTimer);
+        stableTimer = setTimeout(() => {
+          const sensorMsg = `Dữ liệu cảm biến tự động (50s ổn định):\n- Thân nhiệt: ${t} °C\n- Nhịp tim: ${hr} bpm\n- Nồng độ O₂: ${sp}%`;
+          sendToGPT("Sensor", sensorMsg);
+          sentFinal = true;
+        }, 50000);
+      }
 
-    if (sentFinal) return;
+      lastValues = { t, hr, sp };
+    }
+  });
 
-    const changed = 
-      valueThanNhiet !== lastValues.thanNhiet ||
-      valueNhipTim !== lastValues.nhipTim ||
-      valueSpO2 !== lastValues.SpO2;
+  // Nút gửi thủ công
+  sendSensorBtn.addEventListener("click", () => {
+    const t = thanNhiet.textContent;
+    const hr = nhipTim.textContent;
+    const sp = Sp02.textContent;
 
-    if (changed) {
-      if (stableTimer) clearTimeout(stableTimer);
-      stableTimer = setTimeout(() => {
-        const sensorMsg = `Dữ liệu cảm biến ổn định sau 50s:\n- Thân nhiệt: ${valueThanNhiet} °C\n- Nhịp tim: ${valueNhipTim} bpm\n- Nồng độ O₂: ${valueSpO2}%`;
-        sendToGPT("Sensor", sensorMsg);
-        sentFinal = true;
-      }, 50000); // tự động 50s
+    if (t === "--" || hr === "--" || sp === "--") {
+      alert("Cảm biến chưa có dữ liệu!");
+      return;
     }
 
-    lastValues = { thanNhiet: valueThanNhiet, nhipTim: valueNhipTim, SpO2: valueSpO2 };
-  }
-});
+    const sensorMsg = `Dữ liệu cảm biến (gửi thủ công):\n- Thân nhiệt: ${t} °C\n- Nhịp tim: ${hr} bpm\n- Nồng độ O₂: ${sp}%`;
+    sendToGPT("Sensor", sensorMsg);
 
-// Nút gửi dữ liệu cảm biến ngay
-sendSensorBtn.addEventListener("click", () => {
-  const valueThanNhiet = thanNhiet.textContent;
-  const valueNhipTim   = nhipTim.textContent;
-  const valueSpO2      = Sp02.textContent;
-
-  if (valueThanNhiet === "--" || valueNhipTim === "--" || valueSpO2 === "--") {
-    alert("Cảm biến chưa có dữ liệu!");
-    return;
-  }
-
-  const sensorMsg = `Dữ liệu cảm biến (gửi thủ công):\n- Thân nhiệt: ${valueThanNhiet} °C\n- Nhịp tim: ${valueNhipTim} bpm\n- Nồng độ O₂: ${valueSpO2}%`;
-  sendToGPT("Sensor", sensorMsg);
-  sentFinal = true; // tránh gửi tự động nữa
+    // Nếu chưa gửi tự động thì chặn luôn
+    if (!sentFinal) {
+      if (stableTimer) clearTimeout(stableTimer);
+      sentFinal = true;
+    }
+  });
 });
 </script>
 </body>
