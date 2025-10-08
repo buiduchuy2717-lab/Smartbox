@@ -194,4 +194,48 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const t = values[configThanNhiet.id]?.value;
       const hr = values[configNhipTim.id]?.value;
-      const sp = values[configSpO]()
+      const sp = values[configSpO2.id]?.value;
+
+      if (t != null) thanNhiet.textContent = t;
+      if (hr != null) nhipTim.textContent = hr;
+      if (sp != null) Sp02.textContent = sp;
+
+      if (sentFinal) return;
+
+      const changed = t !== lastValues.t || hr !== lastValues.hr || sp !== lastValues.sp;
+
+      if (changed) {
+        if (stableTimer) clearTimeout(stableTimer);
+        stableTimer = setTimeout(() => {
+          const sensorMsg = `Dữ liệu cảm biến tự động (50s ổn định):\n- Thân nhiệt: ${t} °C\n- Nhịp tim: ${hr} bpm\n- Nồng độ O₂: ${sp}%`;
+          sendToGPT("Sensor", sensorMsg);
+          sentFinal = true;
+        }, 50000);
+      }
+
+      lastValues = { t, hr, sp };
+    }
+  });
+
+  sendSensorBtn.addEventListener("click", () => {
+    const t = thanNhiet.textContent;
+    const hr = nhipTim.textContent;
+    const sp = Sp02.textContent;
+
+    if (t === "--" || hr === "--" || sp === "--") {
+      alert("Cảm biến chưa có dữ liệu!");
+      return;
+    }
+
+    const sensorMsg = `Dữ liệu cảm biến (gửi thủ công):\n- Thân nhiệt: ${t} °C\n- Nhịp tim: ${hr} bpm\n- Nồng độ O₂: ${sp}%`;
+    sendToGPT("Sensor", sensorMsg);
+
+    if (!sentFinal) {
+      if (stableTimer) clearTimeout(stableTimer);
+      sentFinal = true;
+    }
+  });
+});
+</script>
+</body>
+</html>
