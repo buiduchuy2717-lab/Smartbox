@@ -19,7 +19,7 @@ html, body {
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100%;
+  height: 100vh; /* Chiếm toàn bộ chiều cao màn hình */
   margin: 0;
   background: white;
   box-sizing: border-box;
@@ -50,6 +50,7 @@ h3 {
   border-radius: 6px;
   background: #fafafa;
   scroll-behavior: smooth;
+  min-height: 200px; /* tăng chiều cao tối thiểu để dễ nhìn */
 }
 
 .msg { margin: 5px 0; }
@@ -61,6 +62,7 @@ h3 {
   display: flex;
   gap: 8px;
   margin-bottom: 8px;
+  flex-shrink: 0; /* không bị ép nhỏ */
 }
 
 input {
@@ -91,14 +93,16 @@ button:hover { background: #45a049; }
   height: 52px;
   font-size: 16px;
   border-radius: 12px;
-  flex-shrink: 0;
+  flex-shrink: 0; /* luôn giữ nguyên kích thước */
+  margin-top: auto; /* đẩy xuống cuối khung */
 }
 
 #sendSensor:hover { background: #1976D2; }
 
-/* tự co giãn cho màn hình nhỏ */
+/* Tối ưu cho màn hình nhỏ */
 @media (max-height: 700px) {
-  #messages { max-height: 50vh; }
+  #messages { min-height: 150px; }
+  #sendSensor { height: 48px; font-size: 15px; }
 }
 </style>
 </head>
