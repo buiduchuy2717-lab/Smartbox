@@ -2,264 +2,314 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Smart Medicine Box</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Smart Medicine Box</title>
 <style>
-html, body {
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  background: #f0f0f0;
-  font-family: sans-serif;
-  overflow: hidden;
+/* --- MOBILE-FIRST STYLES --- */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f4f7f6; /* Nền sáng, thân thiện hơn */
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent; /* Loại bỏ hiệu ứng highlight khi chạm */
 }
 
 #chat {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 100vh;              /* đảm bảo cao bằng chiều cao màn hình */
-  max-height: 100dvh;         /* hỗ trợ thiết bị di động */
-  background: white;
-  box-sizing: border-box;
-  padding: 10px;
-  overflow: hidden;
+    width: 100%;
+    max-width: 600px; /* Có thể tăng max-width cho máy tính bảng, nhưng vẫn ưu tiên điện thoại */
+    margin: 0 auto; /* Căn giữa trên màn hình rộng */
+    background: white;
+    min-height: 100vh; /* Chiếm toàn bộ chiều cao màn hình */
+    display: flex;
+    flex-direction: column;
+    box-shadow: none; /* Bỏ box-shadow để trông như một phần của ứng dụng */
+    padding: 15px; /* Tăng padding tổng thể */
+    box-sizing: border-box;
 }
 
-/* tiêu đề */
 h3 {
-  text-align: center;
-  margin-top: 5px;
-  margin-bottom: 8px;
+    text-align: center;
+    color: #007bff; /* Màu sắc nổi bật hơn cho tiêu đề */
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.5em; /* Kích thước tiêu đề lớn hơn */
 }
 
-/* vùng dữ liệu cảm biến */
+/* --- KHU VỰC DỮ LIỆU CẢM BIẾN --- */
 #sensor-data {
-  font-size: 15px;
-  color: #333;
-  margin-bottom: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around; /* Căn đều các chỉ số */
+    padding: 10px 0;
+    margin-bottom: 15px;
+    background: #e9ecef; /* Nền nhẹ cho khu vực cảm biến */
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
 }
 
-/* vùng hiển thị tin nhắn */
+#sensor-data > div {
+    flex-basis: 30%; /* Cho phép 3 mục trên một hàng nhỏ */
+    text-align: center;
+    font-size: 1.1em;
+    padding: 5px;
+    color: #343a40;
+}
+
+#sensor-data span {
+    display: block; /* Đưa giá trị xuống dòng mới */
+    font-size: 1.4em; /* Làm nổi bật giá trị */
+    font-weight: bold;
+    color: #17a2b8; /* Màu xanh nổi bật */
+    margin-top: 3px;
+}
+
+
+/* --- KHU VỰC TIN NHẮN --- */
 #messages {
-  flex: 1;
-  overflow-y: auto;
-  border: 1px solid #ccc;
-  padding: 10px;
-  margin-bottom: 8px;
-  border-radius: 6px;
-  background: #fafafa;
-  scroll-behavior: smooth;
+    flex-grow: 1; /* Cho phép khu vực tin nhắn mở rộng */
+    min-height: 250px; /* Chiều cao tối thiểu */
+    overflow-y: auto;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 10px;
+    background: #ffffff;
 }
 
-.msg { margin: 5px 0; }
-.user { color: blue; }
-.bot { color: green; }
+.msg {
+    margin: 8px 0;
+    padding: 8px 12px;
+    border-radius: 18px;
+    max-width: 80%;
+    word-wrap: break-word; /* Đảm bảo tin nhắn dài không tràn */
+    line-height: 1.4;
+}
 
-/* vùng nhập */
+.user {
+    background: #007bff;
+    color: white;
+    align-self: flex-end; /* Căn tin nhắn người dùng sang phải */
+    margin-left: auto;
+    border-bottom-right-radius: 2px;
+}
+
+.bot {
+    background: #e9ecef;
+    color: #343a40;
+    align-self: flex-start; /* Căn tin nhắn bot sang trái */
+    border-bottom-left-radius: 2px;
+}
+
+/* Thêm hiệu ứng cho tin nhắn Sensor */
+.sensor {
+    background: #ffc107;
+    color: #212529;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 95%;
+    font-style: italic;
+    font-size: 0.9em;
+    border-radius: 10px;
+}
+
+/* --- KHU VỰC INPUT & NÚT GỬI --- */
 #input-area {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 8px;
-  flex-shrink: 0;
+    display: flex;
+    gap: 5px;
+    margin-bottom: 10px;
 }
 
 input {
-  flex: 1;
-  padding: 10px;
-  font-size: 15px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+    flex: 1;
+    padding: 12px; /* Tăng padding cho dễ chạm */
+    font-size: 16px;
+    border: 1px solid #ced4da;
+    border-radius: 25px; /* Bo tròn hơn */
+    transition: border-color 0.2s;
+}
+
+input:focus {
+    border-color: #007bff;
+    outline: none;
 }
 
 button {
-  padding: 10px 18px;
-  border: none;
-  border-radius: 20px;
-  background: #4CAF50;
-  color: white;
-  cursor: pointer;
-  transition: background 0.2s;
-  font-size: 15px;
+    padding: 12px 20px; /* Tăng padding cho dễ chạm */
+    border: none;
+    border-radius: 25px; /* Bo tròn hơn */
+    background: #28a745; /* Màu xanh lá nổi bật */
+    color: white;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    font-weight: bold;
+    min-width: 80px;
 }
 
-button:hover { background: #45a049; }
+button:hover {
+    background: #218838;
+}
 
-/* nút gửi cảm biến */
+button:active {
+    transform: scale(0.98); /* Hiệu ứng nhấn */
+}
+
 #sendSensor {
-  background: #2196F3;
-  width: 100%;
-  height: 56px;
-  font-size: 16px;
-  border-radius: 14px;
-  flex-shrink: 0;
-  position: sticky;
-  bottom: 0;
-  z-index: 5;
+    width: 100%; /* Nút Gửi Cảm biến chiếm toàn bộ chiều rộng */
+    margin-top: 10px;
+    background: #17a2b8; /* Màu xanh da trời */
+    border-radius: 10px;
 }
 
-#sendSensor:hover { background: #1976D2; }
-
-/* đảm bảo iframe đủ cao */
-html, body, iframe {
-  min-height: 100vh !important;
-  height: 100vh !important;
-}
-
-@media (max-height: 700px) {
-  #messages { max-height: 45vh; }
+#sendSensor:hover {
+    background: #138496;
 }
 </style>
 </head>
 <body>
 
 <div id="chat">
-  <h3>SmartCare</h3>
-
-  <div id="sensor-data">
-    <div>Thân nhiệt: <span id="ThanNhiet">--</span> °C</div>
-    <div>Nhịp tim: <span id="nhipTim">--</span> bpm</div>
-    <div>SpO₂: <span id="Sp02">--</span> %</div>
-  </div>
-
-  <div id="messages"></div>
-
-  <div id="input-area">
-    <input id="input" placeholder="Nhập tin nhắn..." />
-    <button onclick="send()">Gửi</button>
-  </div>
-
-  <button id="sendSensor">Gửi dữ liệu cảm biến</button>
+    <h3><span role="img" aria-label="y tế">⚕️</span> Hộp Thuốc Thông Minh</h3>
+    
+    <div id="sensor-data">
+        <div>Thân nhiệt: <span id="ThanNhiet">--</span> °C</div>
+        <div>Nhịp tim: <span id="nhipTim">--</span> bpm</div>
+        <div>SpO₂: <span id="Sp02">--</span> %</div>
+    </div>
+    
+    <div id="messages"></div>
+    
+    <div id="input-area">
+        <input id="input" placeholder="Nhập tin nhắn..." />
+        <button onclick="send()">Gửi</button>
+    </div>
+    
+    <button id="sendSensor">Gửi dữ liệu cảm biến thủ công</button>
 </div>
 
 <script>
 const API_KEY = "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";
 
 function add(who, text, cls) {
-  const msg = document.createElement("div");
-  msg.className = "msg " + cls;
-  msg.textContent = who + ": " + text;
-  document.getElementById("messages").appendChild(msg);
-  msg.scrollIntoView({ behavior: "smooth" });
+    const msg = document.createElement("div");
+    msg.className = "msg " + cls;
+    
+    // Xử lý hiển thị cho tin nhắn Sensor (có xuống dòng)
+    if (cls === 'sensor') {
+        const lines = text.split('\n');
+        msg.innerHTML = `<strong>${who}:</strong> ${lines.join('<br>')}`;
+    } else {
+        msg.textContent = who + ": " + text;
+    }
+    
+    document.getElementById("messages").appendChild(msg);
+    msg.scrollIntoView({ behavior: 'smooth' });
 }
 
 async function send() {
-  const input = document.getElementById("input");
-  const text = input.value.trim();
-  if (!text) return;
-  input.value = "";
-  sendToGPT("Bạn", text);
+    const input = document.getElementById("input");
+    const text = input.value.trim();
+    if (!text) return;
+    input.value = "";
+    sendToGPT("Bạn", text, "user"); // Thêm class user
 }
 
-async function sendToGPT(sender, text) {
-  add(sender, text, sender === "Bạn" ? "user" : "bot");
-  try {
-    const res = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${API_KEY}`
-      },
-      body: JSON.stringify({
-        model: "gpt-4o-mini",
-        messages: [{ role: "user", content: text }]
-      })
-    });
-    const data = await res.json();
-    const reply = data.choices?.[0]?.message?.content || "(Lỗi API hoặc hết credit)";
-    add("AI", reply, "bot");
-  } catch (err) {
-    add("AI", "⚠️ Lỗi kết nối API", "bot");
-    console.error(err);
-  }
+async function sendToGPT(sender, text, cls) { // Cập nhật để nhận class
+    add(sender, text, cls);
+    try {
+        const res = await fetch("https://api.openai.com/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${API_KEY}`
+            },
+            body: JSON.stringify({
+                model: "gpt-4o-mini",
+                messages: [{ role: "user", content: text }]
+            })
+        });
+        const data = await res.json();
+        const reply = data.choices?.[0]?.message?.content || "(Lỗi API hoặc hết credit)";
+        add("AI", reply, "bot");
+    } catch (err) {
+        add("AI", "⚠️ Lỗi kết nối API", "bot");
+        console.error(err);
+    }
 }
 </script>
 
 <script src="https://www.unpkg.com/@eohjsc/era-widget@1.1.3/src/index.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-  const thanNhiet = document.getElementById('ThanNhiet');
-  const nhipTim = document.getElementById('nhipTim');
-  const Sp02 = document.getElementById('Sp02');
-  const sendSensorBtn = document.getElementById("sendSensor");
+    const thanNhiet = document.getElementById('ThanNhiet');
+    const nhipTim = document.getElementById('nhipTim');
+    const Sp02 = document.getElementById('Sp02');
+    const sendSensorBtn = document.getElementById("sendSensor");
 
-  let configThanNhiet = null, configNhipTim = null, configSpO2 = null;
-  let lastValues = { t: null, hr: null, sp: null };
-  let stableTimer = null;
-  let sentFinal = false;
+    let configThanNhiet = null, configNhipTim = null, configSpO2 = null;
+    let lastValues = { t: null, hr: null, sp: null };
+    let stableTimer = null;
+    let sentFinal = false;
 
-  const eraWidget = new EraWidget();
-  eraWidget.init({
-    needRealtimeConfigs: true,
-    needHistoryConfigs: false,
-    needActions: false,
-    onConfiguration: (cfg) => {
-      configThanNhiet = cfg.realtime_configs[0];
-      configNhipTim = cfg.realtime_configs[1];
-      configSpO2 = cfg.realtime_configs[2];
-      console.log("Realtime configs:", cfg.realtime_configs);
-    },
-    onValues: (values) => {
-      if (!configThanNhiet || !configNhipTim || !configSpO2) return;
+    const eraWidget = new EraWidget();
+    eraWidget.init({
+        needRealtimeConfigs: true,
+        needHistoryConfigs: false,
+        needActions: false,
+        onConfiguration: (cfg) => {
+            configThanNhiet = cfg.realtime_configs[0];
+            configNhipTim = cfg.realtime_configs[1];
+            configSpO2 = cfg.realtime_configs[2];
+            console.log("Realtime configs:", cfg.realtime_configs);
+        },
+        onValues: (values) => {
+            if (!configThanNhiet || !configNhipTim || !configSpO2) return;
 
-      const t = values[configThanNhiet.id]?.value;
-      const hr = values[configNhipTim.id]?.value;
-      const sp = values[configSpO2.id]?.value;
+            const t = values[configThanNhiet.id]?.value;
+            const hr = values[configNhipTim.id]?.value;
+            const sp = values[configSpO2.id]?.value;
 
-      if (t != null) thanNhiet.textContent = t;
-      if (hr != null) nhipTim.textContent = hr;
-      if (sp != null) Sp02.textContent = sp;
+            if (t != null) thanNhiet.textContent = t;
+            if (hr != null) nhipTim.textContent = hr;
+            if (sp != null) Sp02.textContent = sp;
 
-      if (sentFinal) return;
+            if (sentFinal) return;
 
-      const changed = t !== lastValues.t || hr !== lastValues.hr || sp !== lastValues.sp;
+            const changed = t !== lastValues.t || hr !== lastValues.hr || sp !== lastValues.sp;
 
-      if (changed) {
-        if (stableTimer) clearTimeout(stableTimer);
-        stableTimer = setTimeout(() => {
-          const sensorMsg = `Dữ liệu cảm biến tự động (50s ổn định):\n- Thân nhiệt: ${t} °C\n- Nhịp tim: ${hr} bpm\n- Nồng độ O₂: ${sp}%`;
-          sendToGPT("Sensor", sensorMsg);
-          sentFinal = true;
-        }, 50000);
-      }
+            if (changed) {
+                if (stableTimer) clearTimeout(stableTimer);
+                stableTimer = setTimeout(() => {
+                    const sensorMsg = `Dữ liệu cảm biến tự động (50s ổn định):\n- Thân nhiệt: ${t} °C\n- Nhịp tim: ${hr} bpm\n- Nồng độ O₂: ${sp}%`;
+                    sendToGPT("Sensor", sensorMsg, "sensor"); // Thêm class sensor
+                    sentFinal = true;
+                }, 50000);
+            }
 
-      lastValues = { t, hr, sp };
-    }
-  });
+            lastValues = { t, hr, sp };
+        }
+    });
 
-  sendSensorBtn.addEventListener("click", () => {
-    const t = thanNhiet.textContent;
-    const hr = nhipTim.textContent;
-    const sp = Sp02.textContent;
+    // Nút gửi thủ công
+    sendSensorBtn.addEventListener("click", () => {
+        const t = thanNhiet.textContent;
+        const hr = nhipTim.textContent;
+        const sp = Sp02.textContent;
 
-    if (t === "--" || hr === "--" || sp === "--") {
-      alert("Cảm biến chưa có dữ liệu!");
-      return;
-    }
+        if (t === "--" || hr === "--" || sp === "--") {
+            alert("Cảm biến chưa có dữ liệu!");
+            return;
+        }
 
-    const sensorMsg = `Dữ liệu cảm biến (gửi thủ công):\n- Thân nhiệt: ${t} °C\n- Nhịp tim: ${hr} bpm\n- Nồng độ O₂: ${sp}%`;
-    sendToGPT("Sensor", sensorMsg);
+        const sensorMsg = `Dữ liệu cảm biến (gửi thủ công):\n- Thân nhiệt: ${t} °C\n- Nhịp tim: ${hr} bpm\n- Nồng độ O₂: ${sp}%`;
+        sendToGPT("Sensor", sensorMsg, "sensor"); // Thêm class sensor
 
-    if (!sentFinal) {
-      if (stableTimer) clearTimeout(stableTimer);
-      sentFinal = true;
-    }
-  });
+        // Nếu chưa gửi tự động thì chặn luôn
+        if (!sentFinal) {
+            if (stableTimer) clearTimeout(stableTimer);
+            sentFinal = true;
+        }
+    });
 });
 </script>
-
-<!-- Tự động điều chỉnh chiều cao khi iframe nhỏ -->
-<script>
-function adjustChatHeight() {
-  const chat = document.getElementById("chat");
-  const h = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-  chat.style.height = h + "px";
-}
-window.addEventListener("resize", adjustChatHeight);
-if (window.visualViewport) window.visualViewport.addEventListener("resize", adjustChatHeight);
-adjustChatHeight();
-</script>
-
 </body>
 </html>
