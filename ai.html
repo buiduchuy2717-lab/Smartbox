@@ -2,7 +2,8 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Smart Medicine Box</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+<title>Smart Medicine Box</title>
 <style>
 /* --- MOBILE-FIRST STYLES --- */
 body {
@@ -15,39 +16,40 @@ body {
 
 #chat {
     width: 100%;
-    max-width: 600px; /* Có thể tăng max-width cho máy tính bảng, nhưng vẫn ưu tiên điện thoại */
-    margin: 0 auto; /* Căn giữa trên màn hình rộng */
+    max-width: 600px;
+    margin: 0 auto;
     background: white;
-    min-height: 100vh; /* Chiếm toàn bộ chiều cao màn hình */
+    /* ⭐️ ĐÃ SỬA: Tăng chiều cao tối thiểu lên 85% màn hình */
+    min-height: 85vh; 
     display: flex;
     flex-direction: column;
-    box-shadow: none; /* Bỏ box-shadow để trông như một phần của ứng dụng */
-    padding: 15px; /* Tăng padding tổng thể */
+    box-shadow: none;
+    padding: 15px;
     box-sizing: border-box;
 }
 
 h3 {
     text-align: center;
-    color: #007bff; /* Màu sắc nổi bật hơn cho tiêu đề */
+    color: #007bff;
     margin-top: 0;
     margin-bottom: 15px;
-    font-size: 1.5em; /* Kích thước tiêu đề lớn hơn */
+    font-size: 1.5em;
 }
 
 /* --- KHU VỰC DỮ LIỆU CẢM BIẾN --- */
 #sensor-data {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-around; /* Căn đều các chỉ số */
+    justify-content: space-around;
     padding: 10px 0;
     margin-bottom: 15px;
-    background: #e9ecef; /* Nền nhẹ cho khu vực cảm biến */
+    background: #e9ecef;
     border-radius: 8px;
     border: 1px solid #dee2e6;
 }
 
 #sensor-data > div {
-    flex-basis: 30%; /* Cho phép 3 mục trên một hàng nhỏ */
+    flex-basis: 30%;
     text-align: center;
     font-size: 1.1em;
     padding: 5px;
@@ -55,18 +57,19 @@ h3 {
 }
 
 #sensor-data span {
-    display: block; /* Đưa giá trị xuống dòng mới */
-    font-size: 1.4em; /* Làm nổi bật giá trị */
+    display: block;
+    font-size: 1.4em;
     font-weight: bold;
-    color: #17a2b8; /* Màu xanh nổi bật */
+    color: #17a2b8;
     margin-top: 3px;
 }
 
 
 /* --- KHU VỰC TIN NHẮN --- */
 #messages {
-    flex-grow: 1; /* Cho phép khu vực tin nhắn mở rộng */
-    min-height: 250px; /* Chiều cao tối thiểu */
+    flex-grow: 1; 
+    /* ⭐️ ĐÃ SỬA: Tăng chiều cao tối thiểu của khung chat */
+    min-height: 450px; 
     overflow-y: auto;
     border: 1px solid #ced4da;
     border-radius: 8px;
@@ -80,14 +83,14 @@ h3 {
     padding: 8px 12px;
     border-radius: 18px;
     max-width: 80%;
-    word-wrap: break-word; /* Đảm bảo tin nhắn dài không tràn */
+    word-wrap: break-word;
     line-height: 1.4;
 }
 
 .user {
     background: #007bff;
     color: white;
-    align-self: flex-end; /* Căn tin nhắn người dùng sang phải */
+    align-self: flex-end;
     margin-left: auto;
     border-bottom-right-radius: 2px;
 }
@@ -95,7 +98,7 @@ h3 {
 .bot {
     background: #e9ecef;
     color: #343a40;
-    align-self: flex-start; /* Căn tin nhắn bot sang trái */
+    align-self: flex-start;
     border-bottom-left-radius: 2px;
 }
 
@@ -121,10 +124,10 @@ h3 {
 
 input {
     flex: 1;
-    padding: 12px; /* Tăng padding cho dễ chạm */
+    padding: 12px;
     font-size: 16px;
     border: 1px solid #ced4da;
-    border-radius: 25px; /* Bo tròn hơn */
+    border-radius: 25px;
     transition: border-color 0.2s;
 }
 
@@ -134,10 +137,10 @@ input:focus {
 }
 
 button {
-    padding: 12px 20px; /* Tăng padding cho dễ chạm */
+    padding: 12px 20px;
     border: none;
-    border-radius: 25px; /* Bo tròn hơn */
-    background: #28a745; /* Màu xanh lá nổi bật */
+    border-radius: 25px;
+    background: #28a745;
     color: white;
     cursor: pointer;
     transition: background 0.2s, transform 0.1s;
@@ -150,13 +153,13 @@ button:hover {
 }
 
 button:active {
-    transform: scale(0.98); /* Hiệu ứng nhấn */
+    transform: scale(0.98);
 }
 
 #sendSensor {
-    width: 100%; /* Nút Gửi Cảm biến chiếm toàn bộ chiều rộng */
+    width: 100%;
     margin-top: 10px;
-    background: #17a2b8; /* Màu xanh da trời */
+    background: #17a2b8;
     border-radius: 10px;
 }
 
