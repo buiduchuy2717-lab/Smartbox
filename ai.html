@@ -2,30 +2,34 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- ✅ Thêm dòng này -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Smart Medicine Box</title>
 <style>
-body {
-  font-family: sans-serif;
-  background: #f0f0f0;
+html, body {
+  width: 100%;
+  height: 100%;
   margin: 0;
   padding: 0;
+  overflow: hidden;
+  background: #f0f0f0;
+  font-family: sans-serif;
 }
 
 #chat {
-  width: 100%;
-  max-width: 600px; /* cho tablet vẫn đẹp */
-  margin: 0 auto;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  border-radius: 0;
   background: white;
-  border-radius: 10px;
+  box-shadow: none;
   padding: 10px;
-  box-shadow: 0 0 5px #aaa;
-  box-sizing: border-box;
-  min-height: 100vh; /* ✅ full chiều cao màn hình */
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
+  box-sizing: border-box;
 }
 
+/* Giữ nguyên giao diện chat */
 h3 {
   text-align: center;
   margin-top: 10px;
@@ -107,7 +111,6 @@ button:hover { background: #45a049; }
   <button id="sendSensor">Gửi dữ liệu cảm biến</button>
 </div>
 
-<!-- Phần JS giữ nguyên -->
 <script>
 const API_KEY = "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";
 
@@ -213,4 +216,15 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const sensorMsg = `Dữ liệu
+    const sensorMsg = `Dữ liệu cảm biến (gửi thủ công):\n- Thân nhiệt: ${t} °C\n- Nhịp tim: ${hr} bpm\n- Nồng độ O₂: ${sp}%`;
+    sendToGPT("Sensor", sensorMsg);
+
+    if (!sentFinal) {
+      if (stableTimer) clearTimeout(stableTimer);
+      sentFinal = true;
+    }
+  });
+});
+</script>
+</body>
+</html>
