@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Smart Medicine Box</title>
 <style>
 html, body {
@@ -15,34 +15,33 @@ html, body {
   overflow: hidden;
 }
 
-/* khung chính */
 #chat {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
   display: flex;
   flex-direction: column;
+  width: 100%;
+  height: 100vh;              /* đảm bảo cao bằng chiều cao màn hình */
+  max-height: 100dvh;         /* hỗ trợ thiết bị di động */
   background: white;
-  padding: 10px;
   box-sizing: border-box;
+  padding: 10px;
+  overflow: hidden;
 }
 
 /* tiêu đề */
 h3 {
   text-align: center;
-  margin: 4px 0 8px;
+  margin-top: 5px;
+  margin-bottom: 8px;
 }
 
-/* vùng cảm biến */
+/* vùng dữ liệu cảm biến */
 #sensor-data {
   font-size: 15px;
   color: #333;
   margin-bottom: 8px;
 }
 
-/* vùng chat */
+/* vùng hiển thị tin nhắn */
 #messages {
   flex: 1;
   overflow-y: auto;
@@ -52,15 +51,18 @@ h3 {
   border-radius: 6px;
   background: #fafafa;
   scroll-behavior: smooth;
-  min-height: 160px;
 }
+
+.msg { margin: 5px 0; }
+.user { color: blue; }
+.bot { color: green; }
 
 /* vùng nhập */
 #input-area {
   display: flex;
   gap: 8px;
-  flex-shrink: 0;
   margin-bottom: 8px;
+  flex-shrink: 0;
 }
 
 input {
@@ -78,29 +80,35 @@ button {
   background: #4CAF50;
   color: white;
   cursor: pointer;
+  transition: background 0.2s;
   font-size: 15px;
 }
 
 button:hover { background: #45a049; }
 
-/* nút gửi cảm biến cố định */
+/* nút gửi cảm biến */
 #sendSensor {
-  position: sticky;
-  bottom: 0;
   background: #2196F3;
   width: 100%;
-  height: 50px;
+  height: 56px;
   font-size: 16px;
-  border-radius: 12px;
+  border-radius: 14px;
   flex-shrink: 0;
-  z-index: 100;
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
 }
 
 #sendSensor:hover { background: #1976D2; }
 
-/* fix cho màn nhỏ */
+/* đảm bảo iframe đủ cao */
+html, body, iframe {
+  min-height: 100vh !important;
+  height: 100vh !important;
+}
+
 @media (max-height: 700px) {
-  #messages { min-height: 120px; }
+  #messages { max-height: 45vh; }
 }
 </style>
 </head>
@@ -166,16 +174,6 @@ async function sendToGPT(sender, text) {
     console.error(err);
   }
 }
-
-/* ✅ Cập nhật chiều cao khả dụng khi mở bàn phím ảo */
-function adjustHeight() {
-  const chat = document.getElementById("chat");
-  chat.style.height = window.innerHeight + "px";
-}
-
-window.addEventListener("resize", adjustHeight);
-window.addEventListener("orientationchange", adjustHeight);
-document.addEventListener("DOMContentLoaded", adjustHeight);
 </script>
 
 <script src="https://www.unpkg.com/@eohjsc/era-widget@1.1.3/src/index.js"></script>
@@ -200,6 +198,7 @@ document.addEventListener("DOMContentLoaded", () => {
       configThanNhiet = cfg.realtime_configs[0];
       configNhipTim = cfg.realtime_configs[1];
       configSpO2 = cfg.realtime_configs[2];
+      console.log("Realtime configs:", cfg.realtime_configs);
     },
     onValues: (values) => {
       if (!configThanNhiet || !configNhipTim || !configSpO2) return;
@@ -249,5 +248,18 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 </script>
+
+<!-- Tự động điều chỉnh chiều cao khi iframe nhỏ -->
+<script>
+function adjustChatHeight() {
+  const chat = document.getElementById("chat");
+  const h = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+  chat.style.height = h + "px";
+}
+window.addEventListener("resize", adjustChatHeight);
+if (window.visualViewport) window.visualViewport.addEventListener("resize", adjustChatHeight);
+adjustChatHeight();
+</script>
+
 </body>
 </html>
