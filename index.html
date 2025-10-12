@@ -8,10 +8,10 @@
 /* --- MOBILE-FIRST STYLES --- */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #f4f7f6; /* Nền sáng, thân thiện hơn */
+    background: #f4f7f6;
     margin: 0;
     padding: 0;
-    -webkit-tap-highlight-color: transparent; /* Loại bỏ hiệu ứng highlight khi chạm */
+    -webkit-tap-highlight-color: transparent;
 }
 
 #chat {
@@ -19,11 +19,9 @@ body {
     max-width: 600px;
     margin: 0 auto;
     background: white;
-    /* ⭐️ ĐÃ SỬA: Tăng chiều cao tối thiểu lên 85% màn hình */
-    min-height: 85vh; 
+    min-height: 85vh;
     display: flex;
     flex-direction: column;
-    box-shadow: none;
     padding: 15px;
     box-sizing: border-box;
 }
@@ -36,7 +34,6 @@ h3 {
     font-size: 1.5em;
 }
 
-/* --- KHU VỰC DỮ LIỆU CẢM BIẾN --- */
 #sensor-data {
     display: flex;
     flex-wrap: wrap;
@@ -64,12 +61,9 @@ h3 {
     margin-top: 3px;
 }
 
-
-/* --- KHU VỰC TIN NHẮN --- */
 #messages {
-    flex-grow: 1; 
-    /* ⭐️ ĐÃ SỬA: Tăng chiều cao tối thiểu của khung chat */
-    min-height: 450px; 
+    flex-grow: 1;
+    min-height: 450px;
     overflow-y: auto;
     border: 1px solid #ced4da;
     border-radius: 8px;
@@ -102,7 +96,6 @@ h3 {
     border-bottom-left-radius: 2px;
 }
 
-/* Thêm hiệu ứng cho tin nhắn Sensor */
 .sensor {
     background: #ffc107;
     color: #212529;
@@ -115,7 +108,6 @@ h3 {
     border-radius: 10px;
 }
 
-/* --- KHU VỰC INPUT & NÚT GỬI --- */
 #input-area {
     display: flex;
     gap: 5px;
@@ -148,13 +140,8 @@ button {
     min-width: 80px;
 }
 
-button:hover {
-    background: #218838;
-}
-
-button:active {
-    transform: scale(0.98);
-}
+button:hover { background: #218838; }
+button:active { transform: scale(0.98); }
 
 #sendSensor {
     width: 100%;
@@ -162,10 +149,7 @@ button:active {
     background: #17a2b8;
     border-radius: 10px;
 }
-
-#sendSensor:hover {
-    background: #138496;
-}
+#sendSensor:hover { background: #138496; }
 </style>
 </head>
 <body>
@@ -190,20 +174,15 @@ button:active {
 </div>
 
 <script>
-const API_KEY = "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";
-
 function add(who, text, cls) {
     const msg = document.createElement("div");
     msg.className = "msg " + cls;
-    
-    // Xử lý hiển thị cho tin nhắn Sensor (có xuống dòng)
     if (cls === 'sensor') {
         const lines = text.split('\n');
         msg.innerHTML = `<strong>${who}:</strong> ${lines.join('<br>')}`;
     } else {
         msg.textContent = who + ": " + text;
     }
-    
     document.getElementById("messages").appendChild(msg);
     msg.scrollIntoView({ behavior: 'smooth' });
 }
@@ -213,28 +192,26 @@ async function send() {
     const text = input.value.trim();
     if (!text) return;
     input.value = "";
-    sendToGPT("Bạn", text, "user"); // Thêm class user
+    sendToGPT("Bạn", text, "user");
 }
 
-async function sendToGPT(sender, text, cls) { // Cập nhật để nhận class
+async function sendToGPT(sender, text, cls) {
     add(sender, text, cls);
     try {
-        const res = await fetch("https://api.openai.com/v1/chat/completions", {
+        const res = await fetch("api.php", {   // ✅ Gọi file api.php nội bộ
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${API_KEY}`
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 model: "gpt-4o-mini",
                 messages: [{ role: "user", content: text }]
             })
         });
+
         const data = await res.json();
         const reply = data.choices?.[0]?.message?.content || "(Lỗi API hoặc hết credit)";
         add("AI", reply, "bot");
     } catch (err) {
-        add("AI", "⚠️ Lỗi kết nối API", "bot");
+        add("AI", "⚠️ Lỗi kết nối máy chủ (kiểm tra file api.php hoặc key)", "bot");
         console.error(err);
     }
 }
@@ -262,51 +239,39 @@ document.addEventListener("DOMContentLoaded", () => {
             configThanNhiet = cfg.realtime_configs[0];
             configNhipTim = cfg.realtime_configs[1];
             configSpO2 = cfg.realtime_configs[2];
-            console.log("Realtime configs:", cfg.realtime_configs);
         },
         onValues: (values) => {
             if (!configThanNhiet || !configNhipTim || !configSpO2) return;
-
             const t = values[configThanNhiet.id]?.value;
             const hr = values[configNhipTim.id]?.value;
             const sp = values[configSpO2.id]?.value;
-
             if (t != null) thanNhiet.textContent = t;
             if (hr != null) nhipTim.textContent = hr;
             if (sp != null) Sp02.textContent = sp;
-
             if (sentFinal) return;
-
             const changed = t !== lastValues.t || hr !== lastValues.hr || sp !== lastValues.sp;
-
             if (changed) {
                 if (stableTimer) clearTimeout(stableTimer);
                 stableTimer = setTimeout(() => {
                     const sensorMsg = `Dữ liệu cảm biến tự động (50s ổn định):\n- Thân nhiệt: ${t} °C\n- Nhịp tim: ${hr} bpm\n- Nồng độ O₂: ${sp}%`;
-                    sendToGPT("Sensor", sensorMsg, "sensor"); // Thêm class sensor
+                    sendToGPT("Sensor", sensorMsg, "sensor");
                     sentFinal = true;
                 }, 50000);
             }
-
             lastValues = { t, hr, sp };
         }
     });
 
-    // Nút gửi thủ công
     sendSensorBtn.addEventListener("click", () => {
         const t = thanNhiet.textContent;
         const hr = nhipTim.textContent;
         const sp = Sp02.textContent;
-
         if (t === "--" || hr === "--" || sp === "--") {
             alert("Cảm biến chưa có dữ liệu!");
             return;
         }
-
         const sensorMsg = `Dữ liệu cảm biến (gửi thủ công):\n- Thân nhiệt: ${t} °C\n- Nhịp tim: ${hr} bpm\n- Nồng độ O₂: ${sp}%`;
-        sendToGPT("Sensor", sensorMsg, "sensor"); // Thêm class sensor
-
-        // Nếu chưa gửi tự động thì chặn luôn
+        sendToGPT("Sensor", sensorMsg, "sensor");
         if (!sentFinal) {
             if (stableTimer) clearTimeout(stableTimer);
             sentFinal = true;
@@ -316,6 +281,3 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
-
-
-
