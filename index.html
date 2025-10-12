@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
 <title>Smart Medicine Box</title>
 <style>
-/* --- MOBILE-FIRST STYLES --- */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: #f4f7f6;
@@ -198,7 +197,8 @@ async function send() {
 async function sendToGPT(sender, text, cls) {
     add(sender, text, cls);
     try {
-        const res = await fetch("api.php", {   // ✅ Gọi file api.php nội bộ
+        // ✅ Gọi api.php từ tên miền thực tế của bạn (OneHost)
+        const res = await fetch("https://huy717vn.id.vn/api.php", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -211,7 +211,7 @@ async function sendToGPT(sender, text, cls) {
         const reply = data.choices?.[0]?.message?.content || "(Lỗi API hoặc hết credit)";
         add("AI", reply, "bot");
     } catch (err) {
-        add("AI", "⚠️ Lỗi kết nối máy chủ (kiểm tra file api.php hoặc key)", "bot");
+        add("AI", "⚠️ Lỗi kết nối máy chủ (kiểm tra api.php hoặc key API)", "bot");
         console.error(err);
     }
 }
