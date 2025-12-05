@@ -209,9 +209,9 @@ async function sendToGPT(sender, text, cls) {
 
         const data = await res.json();
         const reply = data.choices?.[0]?.message?.content || "(Lỗi API hoặc hết credit)";
-        add("AI", reply, "bot");
+        add("Smart Care", reply, "bot");
     } catch (err) {
-        add("AI", "⚠️ Lỗi kết nối máy chủ (kiểm tra api.php hoặc key API)", "bot");
+        add("Smart Care", "⚠️ Lỗi kết nối máy chủ (kiểm tra api.php hoặc key API)", "bot");
         console.error(err);
     }
 }
@@ -281,3 +281,4 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
+
