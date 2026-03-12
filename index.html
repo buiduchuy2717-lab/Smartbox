@@ -203,7 +203,16 @@ async function sendToGPT(sender, text, cls) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 model: "gpt-4o-mini",
-                messages: [{ role: "user", content: text }]
+                messages: [
+            {
+            role: "system",
+            content: "Bạn là Smart Care y tế của Smart Medicine Box. Hãy phân tích dữ liệu thân nhiệt, nhịp tim và SpO2 hoặc về lĩnh vực y tế. Đưa ra nhận xét sức khỏe ngắn gọn và cảnh báo nếu bất thường. Chỉ trả lời các câu hỏi liên quan đến sức khỏe. Nếu câu hỏi không liên quan thì trả lời là Smart Care chỉ trả lời về vấn đề sức khỏe"
+            },
+            {
+            role: "user",
+            content: text
+            }
+            ]
             })
         });
 
@@ -282,5 +291,6 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
+
 
 
