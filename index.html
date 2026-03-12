@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
 <title>Smart Medicine Box</title>
 <style>
+/* --- MOBILE-FIRST STYLES --- */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: #f4f7f6;
@@ -14,7 +15,7 @@ body {
 }
 
 #chat {
-    width: %;
+    width: 100%;
     max-width: 600px;
     margin: 0 auto;
     background: white;
@@ -197,21 +198,29 @@ async function send() {
 async function sendToGPT(sender, text, cls) {
     add(sender, text, cls);
     try {
-        // ✅ Gọi api.php từ tên miền thực tế của bạn (OneHost)
-        const res = await fetch("https://huy717vn.id.vn/api.php", {
+        const res = await fetch("api.php", {   // Gọi file api.php nội bộ
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 model: "gpt-4o-mini",
-                messages: [{ role: "user", content: text }]
+            messages: [
+            {
+            role: "system",
+            content: "Bạn là Smart Care y tế của Smart Medicine Box. Hãy phân tích dữ liệu thân nhiệt, nhịp tim và SpO2 hoặc về lĩnh vực y tế. Đưa ra nhận xét sức khỏe ngắn gọn và cảnh báo nếu bất thường. Chỉ trả lời các câu hỏi liên quan đến sức khỏe. Nếu câu hỏi không liên quan thì trả lời là Smart Care chỉ trả lời về vấn đề sức khỏe"
+            },
+            {
+            role: "user",
+            content: text
+            }
+            ]
             })
         });
 
         const data = await res.json();
         const reply = data.choices?.[0]?.message?.content || "(Lỗi API hoặc hết credit)";
-        add("Smart Care", reply, "bot");
+        add("SMART CARE", reply, "bot");
     } catch (err) {
-        add("Smart Care", "⚠️ Lỗi kết nối máy chủ (kiểm tra api.php hoặc key API)", "bot");
+        add("AI", "⚠️ Lỗi kết nối máy chủ (kiểm tra file api.php hoặc key)", "bot");
         console.error(err);
     }
 }
@@ -282,11 +291,3 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
